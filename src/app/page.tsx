@@ -2,6 +2,17 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Link from 'next/link';
+
+// Navigation config
+const navItems = [
+  { href: '/', label: 'INICIO' },
+  { href: '/proyectos', label: 'PROYECTOS' },
+  { href: '/servicios', label: 'SERVICIOS' },
+  { href: '/blog', label: 'BLOG' },
+  { href: '/sobre-mi', label: 'SOBRE MÍ' },
+  { href: '/contacto', label: 'CONTACTO' },
+];
 
 // Imágenes de Unsplash
 const HERO_IMAGE = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
@@ -41,6 +52,47 @@ const PROJECTS = [
 
 const STUDIO_IMAGE = 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80';
 
+// Mobile menu with button and nav combined
+function MobileMenu() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  return (
+    <>
+      <button 
+        className="md:hidden text-[#1a1a1a]"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        {mobileMenuOpen ? (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
+      </button>
+      {mobileMenuOpen && (
+        <div className="absolute top-full left-0 right-0 bg-white border-t border-gray-100 shadow-lg">
+          <nav className="flex flex-col py-4">
+            {navItems.map((item) => (
+              <Link 
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-6 py-3 text-gray-600 hover:text-[#7c3aed] hover:bg-[#f8f7ff] transition-colors duration-300"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
@@ -59,30 +111,28 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      {/* Header */}
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-purple-100/50"
-      >
-        <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
-          <h1 className="text-lg font-light tracking-[0.35em] text-[#1a1a1a]">
+      {/* Header - Sticky Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <Link href="/" className="text-lg font-light tracking-[0.25em] text-[#1a1a1a]">
             TAMARA FARAH
-          </h1>
-          <nav className="hidden md:flex gap-10 text-xs tracking-[0.15em] text-gray-400">
-            <a href="#proyectos" className="hover:text-[#7c3aed] transition-all duration-300 hover:scale-105">
-              PROYECTOS
-            </a>
-            <a href="#estudio" className="hover:text-[#7c3aed] transition-all duration-300 hover:scale-105">
-              ESTUDIO
-            </a>
-            <a href="#contacto" className="hover:text-[#7c3aed] transition-all duration-300 hover:scale-105">
-              CONTACTO
-            </a>
+          </Link>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex gap-8 text-sm tracking-widest">
+            {navItems.map((item) => (
+              <Link 
+                key={item.href}
+                href={item.href}
+                className="text-gray-600 hover:text-[#7c3aed] transition-colors duration-300"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
+          {/* Mobile menu */}
+          <MobileMenu />
         </div>
-      </motion.header>
+      </header>
 
       {/* Hero con Parallax */}
       <section 
