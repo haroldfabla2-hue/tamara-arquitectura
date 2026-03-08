@@ -1,10 +1,57 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+
+// Imágenes de Unsplash
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80';
+
+const PROJECTS = [
+  {
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+    title: 'Residencia Moderna',
+    location: 'Lima, Perú',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80',
+    title: 'Oficina Corporate',
+    location: 'Miraflores, Lima',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1600573472591-ee6b68d14c68?w=800&q=80',
+    title: 'Villa Playera',
+    location: 'Costa Verde, Lima',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80',
+    title: 'Departamento de Lujo',
+    location: 'San Isidro, Lima',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80',
+    title: 'Casa de Campo',
+    location: 'Chaclacayo, Lima',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
+    title: 'Edificio Comercial',
+    location: 'Centro de Lima',
+  },
+];
+
+const STUDIO_IMAGE = 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&q=80';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ['start start', 'end start'],
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useEffect(() => {
     setMounted(true);
@@ -12,250 +59,256 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      {/* Hero with Parallax */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-110"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80)',
-          }}
+      {/* Header */}
+      <motion.header
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-purple-100/50"
+      >
+        <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+          <h1 className="text-lg font-light tracking-[0.35em] text-[#1a1a1a]">
+            TAMARA FARAH
+          </h1>
+          <nav className="hidden md:flex gap-10 text-xs tracking-[0.15em] text-gray-400">
+            <a href="#proyectos" className="hover:text-[#7c3aed] transition-all duration-300 hover:scale-105">
+              PROYECTOS
+            </a>
+            <a href="#estudio" className="hover:text-[#7c3aed] transition-all duration-300 hover:scale-105">
+              ESTUDIO
+            </a>
+            <a href="#contacto" className="hover:text-[#7c3aed] transition-all duration-300 hover:scale-105">
+              CONTACTO
+            </a>
+          </nav>
+        </div>
+      </motion.header>
+
+      {/* Hero con Parallax */}
+      <section 
+        ref={heroRef}
+        className="relative h-screen flex items-center justify-center overflow-hidden"
+      >
+        {/* Imagen de fondo con parallax */}
+        <motion.div 
+          style={{ y }}
+          className="absolute inset-0 z-0"
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
-        </div>
-        
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <p className={`text-sm tracking-[0.4em] text-[#a78bfa] mb-6 ${mounted ? 'animate-fade-in-up' : 'opacity-0'}`}>
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+          />
+          {/* Gradient overlay sofisticado */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-violet-900/20" />
+        </motion.div>
+
+        {/* Contenido del hero */}
+        <motion.div 
+          style={{ opacity }}
+          className="relative z-10 max-w-5xl mx-auto px-8 text-center"
+        >
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-sm tracking-[0.4em] text-white/90 mb-6 font-light"
+          >
             ARQUITECTURA & DISEÑO
-          </p>
-          <h2 className={`text-5xl md:text-7xl lg:text-8xl font-light text-white mb-8 leading-tight ${mounted ? 'animate-fade-in-up delay-100' : 'opacity-0'}`}>
+          </motion.p>
+          
+          <motion.h2 
+            initial={{ opacity: 0, y: 40 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-8 leading-[1.1]"
+          >
             Creando espacios<br />
-            <span className="text-[#a78bfa]">que inspiran</span>
-          </h2>
-          <p className={`text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed ${mounted ? 'animate-fade-in-up delay-200' : 'opacity-0'}`}>
+            <span className="bg-gradient-to-r from-purple-300 to-violet-200 bg-clip-text text-transparent">
+              que inspiran
+            </span>
+          </motion.h2>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 40 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="text-white/80 max-w-xl mx-auto mb-12 text-lg font-light leading-relaxed"
+          >
             Diseño arquitectónico contemporáneo con enfoque en la sostenibilidad, 
-            funcionalidad y estética minimalista. Donde cada espacio cuenta una historia.
-          </p>
-          <div className={`flex flex-col sm:flex-row gap-4 justify-center ${mounted ? 'animate-fade-in-up delay-300' : 'opacity-0'}`}>
-            <Link href="/proyectos" className="inline-block px-10 py-4 bg-[#7c3aed] text-white tracking-widest text-sm hover:bg-[#5b21b6] transition-all duration-300 hover:scale-105">
-              VER PROYECTOS
-            </Link>
-            <Link href="/contacto" className="inline-block px-10 py-4 border border-white text-white tracking-widest text-sm hover:bg-white hover:text-[#1a1a1a] transition-all duration-300">
-              CONTACTAR
-            </Link>
-          </div>
-        </div>
+            funcionalidad y estética minimalista.
+          </motion.p>
+          
+          <motion.a 
+            href="#proyectos"
+            initial={{ opacity: 0, y: 40 }}
+            animate={mounted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="inline-block px-10 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white tracking-[0.2em] text-xs hover:bg-white hover:text-purple-900 transition-all duration-500"
+          >
+            VER PROYECTOS
+          </motion.a>
+        </motion.div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-white/70 rounded-full animate-pulse"></div>
-          </div>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={mounted ? { opacity: 1 } : {}}
+          transition={{ delay: 1.2 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div 
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center pt-2"
+          >
+            <div className="w-1 h-2 bg-white/70 rounded-full" />
+          </motion.div>
+        </motion.div>
       </section>
 
-      {/* Featured Projects Preview */}
-      <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <p className="text-sm tracking-[0.3em] text-[#7c3aed] mb-4">PORTAFOLIO</p>
-            <h3 className="text-4xl md:text-5xl font-light text-[#1a1a1a]">Proyectos Destacados</h3>
-            <div className="w-20 h-1 bg-[#7c3aed] mx-auto mt-6"></div>
-          </div>
+      {/* Proyectos */}
+      <section id="proyectos" className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-20"
+          >
+            <h3 className="text-xs tracking-[0.4em] text-[#7c3aed] mb-4 font-medium">PORTAFOLIO</h3>
+            <h2 className="text-4xl md:text-5xl font-light text-[#1a1a1a]">Proyectos Destacados</h2>
+          </motion.div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                id: 1,
-                title: 'Villa Sol',
-                location: 'Lima, Perú',
-                category: 'Residencial',
-                image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-                description: 'Casa moderna con vistas al mar, diseño minimalista y materiales sostenibles.'
-              },
-              {
-                id: 2,
-                title: 'Torre Nexus',
-                location: 'Miraflores, Lima',
-                category: 'Comercial',
-                image: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=800&q=80',
-                description: 'Edificio de oficinas con fachada ventilada y sistemas de eficiencia energética.'
-              },
-              {
-                id: 3,
-                title: 'Loft Centro',
-                location: 'Barranco, Lima',
-                category: 'Interiorismo',
-                image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80',
-                description: 'Renovación de departamento histórico con toques contemporáneos.'
-              }
-            ].map((project, index) => (
-              <div 
-                key={project.id}
-                className="group cursor-pointer"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="relative aspect-[4/3] overflow-hidden mb-5">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute bottom-5 left-5 right-5 text-white transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <p className="text-xs tracking-widest opacity-80">{project.category}</p>
-                    <p className="text-sm mt-1">{project.description}</p>
-                  </div>
-                </div>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="text-xl font-light text-[#1a1a1a] group-hover:text-[#7c3aed] transition-colors">{project.title}</h4>
-                    <p className="text-sm text-gray-400 mt-1">{project.location}</p>
-                  </div>
-                  <span className="text-xs tracking-widest text-gray-400 border border-gray-200 px-3 py-1">
-                    {project.category}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-16">
-            <Link href="/proyectos" className="inline-block px-10 py-4 border border-[#7c3aed] text-[#7c3aed] tracking-widest text-sm hover:bg-[#7c3aed] hover:text-white transition-all duration-300">
-              VER TODOS LOS PROYECTOS
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Preview */}
-      <section className="py-32 bg-[#f8f7ff]">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <p className="text-sm tracking-[0.3em] text-[#7c3aed] mb-4">NUESTROS SERVICIOS</p>
-            <h3 className="text-4xl md:text-5xl font-light text-[#1a1a1a]">Qué Hacemos</h3>
-            <div className="w-20 h-1 bg-[#7c3aed] mx-auto mt-6"></div>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Diseño Arquitectónico',
-                description: 'Proyectos desde la concepción inicial hasta los planos ejecutivos, pasando por anteproyectos y direcciones de obra.',
-                icon: '📐'
-              },
-              {
-                title: 'Interiorismo',
-                description: 'Diseño de interiores que transforman espacios en experiencias únicas, personales y funcionales.',
-                icon: '🎨'
-              },
-              {
-                title: 'Renovación & Remodelación',
-                description: 'Transformación de espacios existentes conservando su esencia pero actualizando su funcionalidad.',
-                icon: '🔧'
-              }
-            ].map((service, index) => (
-              <div 
+            {PROJECTS.map((project, index) => (
+              <motion.div
                 key={index}
-                className="bg-white p-10 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 group"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ y: -10 }}
+                className="group cursor-pointer"
               >
-                <span className="text-4xl mb-6 block">{service.icon}</span>
-                <h4 className="text-xl font-light text-[#1a1a1a] mb-4 group-hover:text-[#7c3aed] transition-colors">
-                  {service.title}
-                </h4>
-                <p className="text-gray-500 leading-relaxed text-sm">
-                  {service.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-16">
-            <Link href="/servicios" className="inline-block px-10 py-4 border border-[#7c3aed] text-[#7c3aed] tracking-widest text-sm hover:bg-[#7c3aed] hover:text-white transition-all duration-300">
-              VER TODOS LOS SERVICIOS
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Blog Preview */}
-      <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <p className="text-sm tracking-[0.3em] text-[#7c3aed] mb-4">BLOG</p>
-            <h3 className="text-4xl md:text-5xl font-light text-[#1a1a1a]">Últimos Artículos</h3>
-            <div className="w-20 h-1 bg-[#7c3aed] mx-auto mt-6"></div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                slug: 'tendencias-arquitectura-sostenible-2026',
-                title: 'Tendencias en Arquitectura Sostenible 2026',
-                date: '8 de Marzo, 2026',
-                image: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=800&q=80',
-                excerpt: 'Descubre las últimas innovaciones en diseño sostenible que están transformando la arquitectura moderna.'
-              },
-              {
-                slug: 'como-elegir-terreno-perfecto-casa',
-                title: 'Cómo elegir el terreno perfecto para tu casa',
-                date: '1 de Marzo, 2026',
-                image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
-                excerpt: 'Guía completa sobre los factores clave que debes considerar antes de comprar el terreno ideal.'
-              },
-              {
-                slug: 'minimalismo-arquitectura-moderna',
-                title: 'El minimalismo en la arquitectura moderna',
-                date: '22 de Febrero, 2026',
-                image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=80',
-                excerpt: 'Explora cómo el diseño minimalista crea espacios que respiran y人的生活质量。'
-              }
-            ].map((post, index) => (
-              <Link 
-                key={post.slug}
-                href={`/blog/${post.slug}`}
-                className="group"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden mb-5">
-                  <img 
-                    src={post.image} 
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                <div className="aspect-[4/3] mb-5 overflow-hidden rounded-sm">
+                  <div 
+                    className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-700"
+                    style={{ backgroundImage: `url(${project.image})` }}
                   />
+                  {/* Overlay en hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-purple-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
-                <p className="text-xs tracking-widest text-[#7c3aed] mb-2">{post.date}</p>
-                <h4 className="text-xl font-light text-[#1a1a1a] group-hover:text-[#7c3aed] transition-colors mb-2">
-                  {post.title}
+                <h4 className="text-lg font-light text-[#1a1a1a] mb-1 group-hover:text-[#7c3aed] transition-colors">
+                  {project.title}
                 </h4>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  {post.excerpt}
-                </p>
-              </Link>
+                <p className="text-sm text-gray-400 font-light">{project.location}</p>
+              </motion.div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="text-center mt-16">
-            <Link href="/blog" className="inline-block px-10 py-4 border border-[#7c3aed] text-[#7c3aed] tracking-widest text-sm hover:bg-[#7c3aed] hover:text-white transition-all duration-300">
-              VER TODOS LOS ARTÍCULOS
-            </Link>
+      {/* Estudio */}
+      <section id="estudio" className="py-32 bg-gradient-to-br from-[#fafafa] to-purple-50/50">
+        <div className="max-w-6xl mx-auto px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <h3 className="text-xs tracking-[0.4em] text-[#7c3aed] mb-4 font-medium">EL ESTUDIO</h3>
+              <h2 className="text-4xl md:text-5xl font-light text-[#1a1a1a] mb-8">
+                Una década de excelencia arquitectónica
+              </h2>
+              <p className="text-gray-600 leading-relaxed mb-8 text-lg font-light">
+                Con más de 10 años de experiencia, Tamara Farah Arquitectura se especializa 
+                en crear espacios que equilibran forma, función y sentimiento. Cada proyecto 
+                es una oportunidad para transformar visiones en realidad tangible.
+              </p>
+              <div className="grid grid-cols-3 gap-8">
+                {[
+                  { number: '10+', label: 'Años de experiencia' },
+                  { number: '50+', label: 'Proyectos completados' },
+                  { number: '100%', label: 'Clientes satisfechos' },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.1 }}
+                    className="text-center"
+                  >
+                    <p className="text-3xl md:text-4xl bg-gradient-to-r from-[#7c3aed] to-[#a78bfa] bg-clip-text text-transparent font-light">
+                      {stat.number}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-2 tracking-wide">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="aspect-[4/5] overflow-hidden rounded-sm">
+                <div 
+                  className="w-full h-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${STUDIO_IMAGE})` }}
+                />
+              </div>
+              {/* Elemento decorativo */}
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-[#7c3aed] to-[#a78bfa] rounded-full opacity-20" />
+              <div className="absolute -top-6 -left-6 w-24 h-24 border border-[#7c3aed]/30 rounded-full" />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-[#1a1a1a]">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h3 className="text-3xl md:text-4xl font-light text-white mb-6">
-            ¿Tienes un proyecto en mente?
-          </h3>
-          <p className="text-white/70 mb-10 leading-relaxed">
-            Nos encantaría conocer tu visión y ayudarte a hacerla realidad. 
-            Contáctanos para una consulta gratuita.
-          </p>
-          <Link href="/contacto" className="inline-block px-10 py-4 bg-[#7c3aed] text-white tracking-widest text-sm hover:bg-[#5b21b6] transition-all duration-300 hover:scale-105">
-            CONTACTAR AHORA
-          </Link>
+      {/* Contacto */}
+      <section id="contacto" className="py-32 bg-white">
+        <div className="max-w-3xl mx-auto px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h3 className="text-xs tracking-[0.4em] text-[#7c3aed] mb-4 font-medium">CONTACTO</h3>
+            <h2 className="text-4xl md:text-5xl font-light text-[#1a1a1a] mb-6">
+              Hablemos de tu proyecto
+            </h2>
+            <p className="text-gray-500 mb-10 text-lg font-light">
+              ¿Tienes un proyecto en mente? Me encantaría conocer tu visión y ayudarte a hacerla realidad.
+            </p>
+            <motion.a 
+              href="mailto:hola@tamarafarah.com"
+              whileHover={{ scale: 1.02 }}
+              className="inline-block text-xl text-[#1a1a1a] hover:text-[#7c3aed] transition-all duration-300 pb-1 border-b border-transparent hover:border-[#7c3aed]"
+            >
+              hola@tamarafarah.com
+            </motion.a>
+          </motion.div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-[#1a1a1a]">
+        <div className="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-sm tracking-[0.2em] text-white/80">TAMARA FARAH ARQUITECTURA</p>
+          <p className="text-xs text-gray-500">© 2026 Todos los derechos reservados</p>
+        </div>
+      </footer>
     </div>
   );
 }
